@@ -460,6 +460,16 @@ function Practice({ mode, setMode, markDone, speak }: any) {
 
 function Lexicon({ saved, setSaved, speak }: any) {
   const [query, setQuery] = useState("");
+  const [catalog, setCatalog] = useState<string[]>([]);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [lookup, setLookup] = useState<Record<string, { definition: string; phonetic: string }>>({});
+  const [loadingWord, setLoadingWord] = useState("");
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}wordbank.txt`)
+      .then((response) => response.text())
+      .then((text) => setCatalog(text.split(/\r?\n/).map((word) => word.trim()).filter((word) => /^[a-z]+$/.test(word))))
+      .catch(() => setCatalog([]));
+  }, []);
   const filtered = useMemo(
     () =>
       words.filter(
@@ -470,6 +480,17 @@ function Lexicon({ saved, setSaved, speak }: any) {
       ),
     [query],
   );
+  const explore = useMemo(() => catalog.filter((word) => word.includes(query.toLowerCase())).slice(0, 40), [catalog, query]);
+  const loadDefinition = async (word: string) => {
+    setLoadingWord(word);
+    try {
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+      const data = await response.json();
+      const entry = data?.[0];
+      const meaning = entry?.meanings?.find((item: { definitions?: unknown[] }) => item.definitions?.length)?.definitions?.[0];
+      if (meaning?.definition) setLookup((items) => ({ ...items, [word]: { definition: meaning.definition, phonetic: entry.phonetic || "" } }));
+    } finally { setLoadingWord(""); }
+  };
   return (
     <div className="lexicon-wrap">
       <div className="lexicon-intro">
@@ -535,6 +556,13 @@ function Lexicon({ saved, setSaved, speak }: any) {
             </div>
           </article>
         ))}
+      </div>
+      <div className="catalog-section">
+        <div className="catalog-heading">
+          <div><span className="eyebrow">10,000-WORD CORE</span><h3>{catalog.length ? `${catalog.length.toLocaleString()} searchable headwords` : "Loading the core wordbank"}</h3><p>Explore by frequency, then open a word to fetch its English definition.</p></div>
+          <button className="secondary" onClick={() => setCatalogOpen(!catalogOpen)}>{catalogOpen ? "Hide wordbank" : "Explore wordbank"}</button>
+        </div>
+        {catalogOpen && <div className="catalog-grid">{explore.map((word) => <article className="catalog-word" key={word}><strong>{word}</strong>{lookup[word] ? <p>{lookup[word].phonetic} · {lookup[word].definition}</p> : <button onClick={() => loadDefinition(word)}>{loadingWord === word ? "Loading..." : "Load definition"}</button>}</article>)}</div>}
       </div>
     </div>
   );
