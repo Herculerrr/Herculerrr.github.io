@@ -937,5 +937,6 @@ button {
   color: var(--muted);
   font-size: 13px;
 }
+.lexicon-count{font-size:12px;color:var(--terracotta);margin:7px 0 0}.catalog-actions{display:flex;gap:10px;margin-top:10px}.catalog-actions button{display:inline-flex;align-items:center;gap:4px;margin:0}.catalog-actions .saved-link{color:var(--olive)}
 .catalog-section{margin-top:28px;border-top:1px solid var(--line);padding-top:24px}.catalog-heading{display:flex;justify-content:space-between;align-items:end;gap:20px}.catalog-heading h3{font-family:'Cormorant Garamond';font-size:27px;margin:7px 0 4px}.catalog-heading p{font-size:12px;color:var(--muted);margin:0}.catalog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}.catalog-word{border:1px solid var(--line);background:var(--paper);padding:12px;min-height:86px}.catalog-word strong{font-family:'Cormorant Garamond';font-size:20px}.catalog-word p{font-size:11px;color:var(--muted);line-height:1.4;margin:7px 0 0}.catalog-word button{display:block;margin-top:9px;background:transparent;color:var(--blue);font-size:11px;font-weight:700;padding:0}.catalog-word button:hover{text-decoration:underline}
 @media(max-width:800px){.catalog-heading{display:block}.catalog-heading .secondary{margin-top:15px}.catalog-grid{grid-template-columns:repeat(2,1fr)}}

@@ -464,6 +464,7 @@ function Lexicon({ saved, setSaved, speak }: any) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [lookup, setLookup] = useState<Record<string, { definition: string; phonetic: string }>>({});
   const [loadingWord, setLoadingWord] = useState("");
+  const toggleSaved = (word: string) => setSaved(saved.includes(word) ? saved.filter((item: string) => item !== word) : [...saved, word]);
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}wordbank.txt`)
       .then((response) => response.text())
@@ -497,6 +498,7 @@ function Lexicon({ saved, setSaved, speak }: any) {
         <div>
           <span className="eyebrow">YOUR LIVING VOCABULARY</span>
           <h2>Words worth returning to.</h2>
+          <p className="lexicon-count">{saved.length} saved for review</p>
         </div>
         <div className="search-box">
           <Translate size={18} />
@@ -538,13 +540,7 @@ function Lexicon({ saved, setSaved, speak }: any) {
                     ? "save-button saved"
                     : "save-button"
                 }
-                onClick={() =>
-                  setSaved(
-                    saved.includes(item.word)
-                      ? saved.filter((x: string) => x !== item.word)
-                      : [...saved, item.word],
-                  )
-                }
+                onClick={() => toggleSaved(item.word)}
               >
                 {saved.includes(item.word) ? (
                   <Check size={17} />
@@ -562,7 +558,7 @@ function Lexicon({ saved, setSaved, speak }: any) {
           <div><span className="eyebrow">10,000-WORD CORE</span><h3>{catalog.length ? `${catalog.length.toLocaleString()} searchable headwords` : "Loading the core wordbank"}</h3><p>Explore by frequency, then open a word to fetch its English definition.</p></div>
           <button className="secondary" onClick={() => setCatalogOpen(!catalogOpen)}>{catalogOpen ? "Hide wordbank" : "Explore wordbank"}</button>
         </div>
-        {catalogOpen && <div className="catalog-grid">{explore.map((word) => <article className="catalog-word" key={word}><strong>{word}</strong>{lookup[word] ? <p>{lookup[word].phonetic} · {lookup[word].definition}</p> : <button onClick={() => loadDefinition(word)}>{loadingWord === word ? "Loading..." : "Load definition"}</button>}</article>)}</div>}
+        {catalogOpen && <div className="catalog-grid">{explore.map((word) => <article className="catalog-word" key={word}><strong>{word}</strong>{lookup[word] ? <><p>{lookup[word].phonetic} · {lookup[word].definition}</p><div className="catalog-actions"><button onClick={() => speak(word)} aria-label={`Play ${word}`}><SpeakerHigh size={15}/> Listen</button><button className={saved.includes(word) ? "saved-link" : ""} onClick={() => toggleSaved(word)}>{saved.includes(word) ? <><Check size={15}/> Saved</> : <><Plus size={15}/> Save</>}</button></div></> : <button onClick={() => loadDefinition(word)}>{loadingWord === word ? "Loading..." : "Load definition"}</button>}</article>)}</div>}
       </div>
     </div>
   );
